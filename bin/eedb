@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 
 require "eedb"
+require "fileutils"
+
+if !File.exists?("tmp")
+  FileUtils.mkdir_p("tmp")
+end
 
 existing_yaml_file = File.exists?("eedb.yml")
 
