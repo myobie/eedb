@@ -9,7 +9,12 @@ TIME = Time.now.to_i
 LOCAL_DUMP_FILE = File.expand_path("tmp/local-dump-#{TIME}.sql")
 REMOTE_DUMP_FILE = File.expand_path("tmp/remote-dump-#{TIME}.sql")
 
-PREFS = YAML.load_file("eedb.yml")
+if File.exists?("eedb.yml")
+  PREFS = YAML.load_file("eedb.yml")
+else
+  puts "!!! An eedb.yml file must exist and contain your database information."
+  exit
+end
 
 if PREFS["opt"].empty?
   OPT = '--skip-add-locks --skip-create-options --skip-disable-keys --skip-lock-tables --skip-set-charset --compatible="mysql40"'
@@ -23,7 +28,7 @@ else
   REGEX = PREFS["regex"]
 end
 
-if PREFS["patterns"].empty?
+if PREFS["replace"].empty?
   PATTERNS = {}
 else
   PATTERNS = PREFS["replace"]
@@ -31,11 +36,11 @@ end
 
 class Eedb
   
-  def self.rollback(which = :remote)
+  def self.rollback(which)
     backup = File.expand_path(Dir["tmp/#{which}-dump-*.sql.backup"].last)
     
     print "-   Are you sure you want to rollback the #{which} DB? (Y/n): "
-    answer = gets.chomp
+    answer = STDIN.gets.chomp
 
     if answer == "Y"
       log "*** Rolling back #{which} using #{backup}..."
@@ -45,60 +50,38 @@ class Eedb
     log "*** Done."
   end
   
-  def self.export
-    log "*** Starting export..."
+  def self.export(server = :local)
+    other_server = server == :local ? :remote : :local
+    
+    log "*** Starting dump..."
 
-    print "-   Do you want to backup the remote DB? (Y/n): "
-    answer = gets.chomp
+    log "*   Dumping #{server}..."
+    Mysql.dump(server)
 
-    if answer == "Y"
-      log "*   Dumping remote as backup..."
-      Mysql.dump(:remote, :backup)
-    end
-
-    log "*   Dumping local..."
-    Mysql.dump(:local)
-
-    print "-   Do you want to push the export to the remote server? (Y/n): "
-    answer = gets.chomp
+    print "-   Do you want to push this into the #{other_server} server? (Y/n): "
+    answer = STDIN.gets.chomp
 
     if answer == "Y"
-      log "**  Cleanup local..."
-      cleaned_file = Mysql.cleanup_file(:local)
+      print "-   Do you want to backup the #{other_server} DB? (Y/n): "
+      answer2 = STDIN.gets.chomp
+
+      if answer2 == "Y"
+        log "*   Dumping #{other_server} as backup..."
+        Mysql.dump(other_server, :backup)
+      end
       
-      log "*** Pushing local cleaned file to remote..."
-      Mysql.import(cleaned_file => :remote)
+      log "**  Cleanup #{server}..."
+      cleaned_file = Mysql.cleanup_file(server)
+      
+      log "*** Pushing #{server} cleaned file to #{other_server}..."
+      Mysql.import(cleaned_file => other_server)
     end
 
     log "*** Done."
   end
   
   def self.import
-    log "*** Starting impor..."
-    
-    print "-   Do you want to backup the local DB? (Y/n): "
-    answer = gets.chomp
-    
-    if answer == "Y"
-      log "*   Dumping local as backup..."
-      Mysql.dump(:local, :backup)
-    end
-    
-    log "*   Dumping remote..."
-    Mysql.dump(:remote)
-
-    print "-   Do you want to pull the export into the local server? (Y/n): "
-    answer = gets.chomp
-
-    if answer == "Y"
-      log "**  Cleanup remote..."
-      cleaned_file = Mysql.cleanup_file(:remote)
-      
-      log "*** Pushing local cleaned file to remote..."
-      Mysql.import(cleaned_file => :local)
-    end
-
-    log "*** Done."
+    export(:remote)
   end
   
   def self.log(what)

@@ -26,10 +26,12 @@ class Mysql
     `mysql #{options} #{db} -e "SOURCE #{file}"`
   end
   
-  def self.cleanup_file(file, server = nil)
+  def self.cleanup_file(file)
+    other_server = nil
+    
     if file.is_a?(Symbol)
-      server = :remote if file == :local
-      server = :local if file == :remote
+      other_server = :remote if file == :local
+      other_server = :local if file == :remote
       
       file = const_get(file.to_s.upcase + "_DUMP_FILE")
     end
@@ -37,17 +39,17 @@ class Mysql
     cleaned_file = File.expand_path(file + ".cleaned")
     
     # only clean it if we know what server it's going to
-    if server
+    if other_server
       contents = File.new(file, "r").read
       
-      if server == :remote
+      if other_server == :remote
         first, second = "local", "remote"
         # if remote is the server, we want to substitue all local for remote
       else
         first, second = "remote", "local"
         # if local is the server, we want to substitue all remote for local
       end
-    
+      
       PATTERNS.each do |name, pattern|
         f = pattern[first]
         r = pattern[second]
