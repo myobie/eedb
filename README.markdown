@@ -7,6 +7,15 @@ You want to create a new weblog locally (maybe using MAMP or something), create 
 
 This command line program attempts to solve this.
 
+How do I install this?
+======================
+
+On your terminal, type:
+
+    gem install eedb
+
+If you have ruby and rubygems, that should work just fine (all Macs should have this). If not, then go get those things (I'll try to provide links when I get more time).
+
 How to use this thing?
 ======================
 
