@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require "eedb"
+
+if ARGV.length < 1
+  usage
+  exit
+end
+
+case ARGV[0]
+when "import"
+  Eedb.import
+when "export"
+  Eedb.export
+when "rollback"
+  Eedb.rollback(ARGV[1])
+end
