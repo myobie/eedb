@@ -3,7 +3,7 @@
 require "eedb"
 
 if ARGV.length < 1
-  usage
+  puts "eedb [export|import|rollback (local|remote)]"
   exit
 end
 
