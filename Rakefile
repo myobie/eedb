@@ -12,6 +12,8 @@ begin
     gem.authors = ["Nathan Herald"]
     gem.add_development_dependency "bacon", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    
+    gem.files.include FileList['lib/eedb/templates/*']
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

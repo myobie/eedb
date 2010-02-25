@@ -2,8 +2,28 @@
 
 require "eedb"
 
+existing_yaml_file = File.exists?("eedb.yml")
+
+def create_yaml_file
+  yaml_file = File.expand_path(File.join(File.dirname(__FILE__), "../lib/eedb/templates/eedb.yml"))
+  yaml_contents = File.new(yaml_file, "r").read
+  File.open("eedb.yml", "w+") do |f|
+    f.write(yaml_contents)
+  end
+  
+  puts "!!! An example eedb.yml file has been created for you. Please update it"
+  puts "    with the correct information before running eedb."
+  puts yaml_file
+end
+
+if !existing_yaml_file
+  puts "!!! An eedb.yml file must exist and contain your database information."
+  create_yaml_file
+  exit
+end
+
 if ARGV.length < 1
-  puts "eedb [export|import|rollback (local|remote)]"
+  puts "eedb [init|export|import|rollback (local|remote)]"
   exit
 end
 
@@ -14,4 +34,17 @@ when "export"
   Eedb.export
 when "rollback"
   Eedb.rollback(ARGV[1])
+when "init"
+  
+  if existing_yaml_file
+    print "-   Do you want to ovewrite the existing eedb.yml file? (Y/n): "
+    answer = STDIN.gets.chomp
+
+    if answer == "Y"
+      create_yaml_file
+    end
+  else
+    create_yaml_file
+  end
+  
 end

@@ -1,0 +1,21 @@
+databases:
+  local:
+    database: example
+    options:
+      host: localhost
+      user: root
+      password:
+  remote:
+    database: example_production
+    options:
+      host: db.example.com
+      user: example_db_user
+      password: db_password
+
+replace:
+  file_path:
+    local: "/Users/you/Sites/example.com"
+    remote: "/home/1234/domains/example.com/html"
+  url:
+    local: "http://example.local"
+    remote: "http://example.com"

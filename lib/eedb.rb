@@ -12,8 +12,7 @@ REMOTE_DUMP_FILE = File.expand_path("tmp/remote-dump-#{TIME}.sql")
 if File.exists?("eedb.yml")
   PREFS = YAML.load_file("eedb.yml")
 else
-  puts "!!! An eedb.yml file must exist and contain your database information."
-  exit
+  PREFS = Hash.new(Hash.new({})) # make a fake hash that has hashes in it
 end
 
 if PREFS["opt"].empty?

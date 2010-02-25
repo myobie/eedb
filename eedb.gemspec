@@ -25,9 +25,11 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "bin/eedb",
+     "eedb.gemspec",
      "lib/eedb.rb",
      "lib/eedb/ext.rb",
-     "lib/eedb/mysql.rb"
+     "lib/eedb/mysql.rb",
+     "lib/eedb/templates/eedb.yml"
   ]
   s.homepage = %q{http://github.com/myobie/eedb}
   s.rdoc_options = ["--charset=UTF-8"]
