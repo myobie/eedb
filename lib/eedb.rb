@@ -16,7 +16,7 @@ else
 end
 
 if PREFS["opt"].empty?
-  OPT = '--skip-add-locks --skip-create-options --skip-disable-keys --skip-lock-tables --skip-set-charset --compatible="mysql40"'
+  OPT = '--skip-add-locks --skip-disable-keys --skip-lock-tables --skip-set-charset --compatible="mysql40"'
 else
   OPT = PREFS["opt"]
 end
